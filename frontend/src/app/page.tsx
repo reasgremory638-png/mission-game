@@ -10,12 +10,14 @@ import confetti from "canvas-confetti";
 import { motion } from "motion/react";
 import GameButton from "@/components/GameButton";
 import { RefreshCw, ShoppingBag, Coins } from "lucide-react";
+import { useSound } from "@/hooks/useSound";
 
 export default function Home() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
   const [showShop, setShowShop] = useState(false);
   const [stats, setStats] = useState({ shells: 0, streak: 0, inventory: [] as string[] });
+  const { playSound } = useSound();
 
   const refreshAll = async () => {
     const [habitData, statData] = await Promise.all([
@@ -37,6 +39,7 @@ export default function Home() {
   };
 
   const handleCompleteSuccess = async (dayNumber: number, log: string, photo?: string) => {
+    playSound("success");
     await completeHabit(dayNumber, log, photo);
     setSelectedHabit(null);
     
@@ -54,6 +57,7 @@ export default function Home() {
   const handleBuy = async (itemId: string, cost: number) => {
     const res = await buyItem(itemId, cost);
     if (res.success) {
+        playSound("buy");
         refreshAll();
     } else {
         alert(res.message);

@@ -103,20 +103,31 @@ export async function resetGame() {
 
 export async function getParrotAdvice() {
     const db = await getDb();
-    const lastCompleted = await db.get('SELECT log_text FROM habits WHERE status = "completed" ORDER BY day_number DESC LIMIT 1');
+    const lastCompleted = await db.get('SELECT log_text, day_number FROM habits WHERE status = "completed" ORDER BY day_number DESC LIMIT 1');
+    const streakData = await db.get('SELECT value FROM settings WHERE key = ?', ['streak']);
+    const streak = parseInt(streakData?.value || '0');
     
     if (!lastCompleted || !lastCompleted.log_text) {
-        return "Squawk! Your island looks a bit empty. Start your first quest to see it grow!";
+        return "Squawk! Your island looks a bit empty. Start your first quest to see it grow! 🏝️";
     }
 
     const log = lastCompleted.log_text.toLowerCase();
     
-    if (log.includes("tired") || log.includes("hard")) {
-        return "Squawk! Even the strongest palms bend in the wind. Rest up, Islander!";
-    }
-    if (log.includes("good") || log.includes("happy") || log.includes("done")) {
-        return "Squawk! Victory! I can smell the success from here. Keep those streaks burning!";
+    if (streak >= 5) {
+        return `Squawk! A ${streak}-day streak?! You're making this island look like a palace! 🔥🦜`;
     }
 
-    return "Squawk! I saw what you did! Every step counts on this island.";
+    if (log.includes("tired") || log.includes("hard") || log.includes("exhausted")) {
+        return "Squawk! Even the strongest palms bend in the wind. Rest is also a part of progress, Islander! 🌴💤";
+    }
+
+    if (log.includes("good") || log.includes("happy") || log.includes("done") || log.includes("success")) {
+        return "Squawk! Victory! I can smell the success from here. Keep that energy high! 🎊✨";
+    }
+
+    if (lastCompleted.day_number > 20) {
+        return "Squawk! We're so close to the finish line! Can you see the Castle from here? 🏰🦜";
+    }
+
+    return "Squawk! I saw what you did! Every small step makes this island a better place. 🦜🌈";
 }

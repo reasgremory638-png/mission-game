@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { ReactNode } from "react";
+import { useSound } from "@/hooks/useSound";
 
 interface GameButtonProps {
   children: ReactNode;
@@ -18,6 +19,15 @@ export default function GameButton({
   variant = "primary",
   disabled = false,
 }: GameButtonProps) {
+  const { playSound } = useSound();
+
+  const handleClick = () => {
+    if (!disabled && onClick) {
+      playSound("click");
+      onClick();
+    }
+  };
+
   const variants = {
     primary: "bg-ocean text-white border-b-4 border-emerald-600 hover:bg-emerald-400",
     secondary: "bg-vegetation text-white border-b-4 border-emerald-800 hover:bg-emerald-500",
@@ -30,7 +40,7 @@ export default function GameButton({
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       disabled={disabled}
-      onClick={onClick}
+      onClick={handleClick}
       className={`
         px-6 py-3 rounded-2xl font-bold transition-colors cursor-pointer
         disabled:opacity-50 disabled:cursor-not-allowed
