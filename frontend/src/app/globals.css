@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6d7b0; /* Sand */
+  --foreground: #2d3436;
+
+  --color-sand: #f6d7b0;
+  --color-ocean: #4ecdc4;
+  --color-vegetation: #06d6a0;
+  --color-enemy: #ff6b6b;
+  --color-gold: #ffd93d;
+  --color-cozy-white: #fef9f3;
+}
+
+@theme {
+  --color-sand: var(--color-sand);
+  --color-ocean: var(--color-ocean);
+  --color-vegetation: var(--color-vegetation);
+  --color-enemy: var(--color-enemy);
+  --color-gold: var(--color-gold);
+  --color-cozy-white: var(--color-cozy-white);
+
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
