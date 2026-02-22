@@ -1,0 +1,37 @@
+.app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.loading-spinner {
+  text-align: center;
+}
+
+.loading-spinner svg {
+  width: 60px;
+  height: 60px;
+  stroke: var(--primary-light);
+  stroke-width: 2;
+  fill: none;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner p {
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  font-size: 1rem;
+}
