@@ -1,14 +1,24 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getParrotAdvice } from "@/actions/habitActions";
 
 export default function ParrotCompanion() {
   const [isOpen, setIsOpen] = useState(false);
-  const message = "Squawk! Ready for your daily quest?";
+  const [message, setMessage] = useState("Squawk! Ready for your daily quest?");
+
+  const fetchAdvice = async () => {
+    const advice = await getParrotAdvice();
+    setMessage(advice);
+  };
+
+  useEffect(() => {
+    fetchAdvice();
+  }, []);
 
   return (
-    <div className="fixed bottom-8 right-8 z-40 flex flex-col items-end gap-4">
+    <div className="fixed bottom-32 right-8 z-40 flex flex-col items-end gap-4 print:hidden">
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -28,7 +38,10 @@ export default function ParrotCompanion() {
       <motion.button
         whileHover={{ scale: 1.1, rotate: 5 }}
         whileTap={{ scale: 0.9 }}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+            setIsOpen(!isOpen);
+            if (!isOpen) fetchAdvice();
+        }}
         className="w-20 h-20 bg-ocean rounded-full flex items-center justify-center border-b-8 border-emerald-600 shadow-2xl text-4xl"
       >
         🦜

@@ -100,3 +100,23 @@ export async function resetGame() {
     await db.run("UPDATE habits SET status = 'active' WHERE day_number = 1");
     revalidatePath("/");
 }
+
+export async function getParrotAdvice() {
+    const db = await getDb();
+    const lastCompleted = await db.get('SELECT log_text FROM habits WHERE status = "completed" ORDER BY day_number DESC LIMIT 1');
+    
+    if (!lastCompleted || !lastCompleted.log_text) {
+        return "Squawk! Your island looks a bit empty. Start your first quest to see it grow!";
+    }
+
+    const log = lastCompleted.log_text.toLowerCase();
+    
+    if (log.includes("tired") || log.includes("hard")) {
+        return "Squawk! Even the strongest palms bend in the wind. Rest up, Islander!";
+    }
+    if (log.includes("good") || log.includes("happy") || log.includes("done")) {
+        return "Squawk! Victory! I can smell the success from here. Keep those streaks burning!";
+    }
+
+    return "Squawk! I saw what you did! Every step counts on this island.";
+}

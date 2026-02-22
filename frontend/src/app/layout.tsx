@@ -8,8 +8,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Island Habits | Build Your Paradise",
-  description: "A 30-day habit tracking game.",
+  title: "Island Habits",
+  description: "A cozy 30-day habit tracking game",
+  manifest: "/manifest.json",
+  themeColor: "#4ECDC4",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Island Habits",
+  },
 };
 
 export default function RootLayout({
