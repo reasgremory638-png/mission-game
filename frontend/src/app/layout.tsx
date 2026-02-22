@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -7,11 +7,14 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#4ECDC4",
+};
+
 export const metadata: Metadata = {
   title: "Island Habits",
   description: "A cozy 30-day habit tracking game",
   manifest: "/manifest.json",
-  themeColor: "#4ECDC4",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
