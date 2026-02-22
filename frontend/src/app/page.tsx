@@ -19,6 +19,27 @@ export default function Home() {
   const [stats, setStats] = useState({ shells: 0, streak: 0, inventory: [] as string[] });
   const { playSound } = useSound();
 
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadData() {
+      const [habitData, statData] = await Promise.all([
+        getHabits(),
+        getGameStats()
+      ]);
+      if (!ignore) {
+        setHabits(habitData);
+        setStats(statData);
+      }
+    }
+
+    loadData();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
   const refreshAll = async () => {
     const [habitData, statData] = await Promise.all([
       getHabits(),
@@ -27,10 +48,6 @@ export default function Home() {
     setHabits(habitData);
     setStats(statData);
   };
-
-  useEffect(() => {
-    refreshAll();
-  }, []);
 
   const handleNodeClick = (habit: Habit) => {
     if (habit.status === 'active') {
