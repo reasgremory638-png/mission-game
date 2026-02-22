@@ -28,7 +28,16 @@ export async function getDb() {
       key TEXT PRIMARY KEY,
       value TEXT
     );
+
+    CREATE TABLE IF NOT EXISTS inventory (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      item_id TEXT UNIQUE
+    );
   `);
+
+  // Initialize settings if they don't exist
+  await db.run('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)', ['shells', '0']);
+  await db.run('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)', ['streak', '0']);
 
   // Initialize habits if they don't exist
   const count = await db.get('SELECT COUNT(*) as count FROM habits');

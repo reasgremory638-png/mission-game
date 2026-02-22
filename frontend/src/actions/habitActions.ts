@@ -44,8 +44,17 @@ export async function completeHabit(dayNumber: number, logText: string, photoUrl
     ['completed', logText, photoUrl || null, completionDate, dayNumber]
   );
 
+  // Gamification: Award Shells (10 per day)
+  const currentShells = await db.get('SELECT value FROM settings WHERE key = ?', ['shells']);
+  const newShells = parseInt(currentShells.value) + 10;
+  await db.run('UPDATE settings SET value = ? WHERE key = ?', [newShells.toString(), 'shells']);
+
+  // Increment Streak
+  const currentStreak = await db.get('SELECT value FROM settings WHERE key = ?', ['streak']);
+  const newStreak = parseInt(currentStreak.value) + 1;
+  await db.run('UPDATE settings SET value = ? WHERE key = ?', [newStreak.toString(), 'streak']);
+
   // Activate next day if it's currently locked
-  // If this was a make-up day, we continue from the next available node
   const nextDay = dayNumber + 1;
   const nextHabit = await db.get('SELECT * FROM habits WHERE day_number = ?', [nextDay]);
   
@@ -53,12 +62,36 @@ export async function completeHabit(dayNumber: number, logText: string, photoUrl
     if (nextHabit.status === 'locked') {
         await db.run('UPDATE habits SET status = ? WHERE day_number = ?', ['active', nextDay]);
     }
-  } else if (dayNumber < 30) {
-      // Should not happen unless DB is corrupted, but safe check
-      await db.run('INSERT INTO habits (day_number, status) VALUES (?, ?)', [nextDay, 'active']);
   }
 
   revalidatePath("/");
+}
+
+export async function getGameStats() {
+    const db = await getDb();
+    const shells = await db.get('SELECT value FROM settings WHERE key = ?', ['shells']);
+    const streak = await db.get('SELECT value FROM settings WHERE key = ?', ['streak']);
+    const inventory = await db.all('SELECT item_id FROM inventory');
+    
+    return {
+        shells: parseInt(shells?.value || '0'),
+        streak: parseInt(streak?.value || '0'),
+        inventory: inventory.map(i => i.item_id)
+    };
+}
+
+export async function buyItem(itemId: string, cost: number) {
+    const db = await getDb();
+    const currentShells = await db.get('SELECT value FROM settings WHERE key = ?', ['shells']);
+    const shells = parseInt(currentShells.value);
+
+    if (shells >= cost) {
+        await db.run('UPDATE settings SET value = ? WHERE key = ?', [(shells - cost).toString(), 'shells']);
+        await db.run('INSERT OR IGNORE INTO inventory (item_id) VALUES (?)', [itemId]);
+        revalidatePath("/");
+        return { success: true };
+    }
+    return { success: false, message: "Not enough shells!" };
 }
 
 export async function resetGame() {

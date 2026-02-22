@@ -7,6 +7,8 @@ import { Star, Skull, Lock, TreePalm, Home, Castle, Waves, LucideIcon } from "lu
 interface IslandMapProps {
   habits: Habit[];
   onNodeClick: (habit: Habit) => void;
+  inventory?: string[];
+  streak?: number;
 }
 
 interface AssetMilestone {
@@ -21,7 +23,13 @@ const ASSET_MILESTONES: Record<number, AssetMilestone> = {
   30: { icon: Castle, label: "The Castle" },
 };
 
-export default function IslandMap({ habits, onNodeClick }: IslandMapProps) {
+const DECORATIONS: Record<string, { icon: string; x: number; y: number }> = {
+    'item_fire': { icon: '🔥', x: 20, y: 70 },
+    'item_boat': { icon: '⛵', x: 80, y: 85 },
+    'item_hammock': { icon: '🪑', x: 70, y: 75 },
+};
+
+export default function IslandMap({ habits, onNodeClick, inventory = [], streak = 0 }: IslandMapProps) {
   // Generate a winding path
   const nodes = habits.map((habit, i) => {
     const x = 50 + Math.sin(i * 0.8) * 30; // Winding horizontally
@@ -31,8 +39,22 @@ export default function IslandMap({ habits, onNodeClick }: IslandMapProps) {
 
   return (
     <div className="relative w-full min-h-[150vh] bg-sand overflow-hidden p-8 pb-32">
-      {/* Visual Assets based on progress */}
-      <div className="absolute inset-0 pointer-events-none opacity-20">
+      {/* Background Life (Waves/Clouds) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div 
+            animate={{ x: [0, 20, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            className="absolute top-20 left-10 text-6xl opacity-20"
+        >☁️</motion.div>
+        <motion.div 
+            animate={{ x: [0, -30, 0] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            className="absolute top-40 right-10 text-5xl opacity-10"
+        >☁️</motion.div>
+      </div>
+
+      {/* Visual Assets based on progress & Shop Items */}
+      <div className="absolute inset-0 pointer-events-none opacity-40">
         {habits.map((h, i) => {
             if (h.status === 'completed' && ASSET_MILESTONES[h.day_number]) {
                 const AssetIcon = ASSET_MILESTONES[h.day_number].icon;
@@ -53,22 +75,56 @@ export default function IslandMap({ habits, onNodeClick }: IslandMapProps) {
             }
             return null;
         })}
+
+        {/* Shop Items rendering */}
+        {inventory.map((itemId) => {
+            const decor = DECORATIONS[itemId];
+            if (!decor) return null;
+            return (
+                <motion.div
+                    key={itemId}
+                    initial={{ scale: 0, rotate: -20 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    className="absolute text-5xl"
+                    style={{ left: `${decor.x}%`, top: `${decor.y}%` }}
+                >
+                    {decor.icon}
+                </motion.div>
+            );
+        })}
       </div>
 
       {nodes.length > 0 && (
         <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path
+          <motion.path
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.5 }}
+            transition={{ duration: 2, ease: "easeInOut" }}
             d={`M ${nodes[0].x} ${nodes[0].y} ${nodes.slice(1).map(n => `L ${n.x} ${n.y}`).join(' ')}`}
             fill="none"
             stroke="#4ECDC4"
             strokeWidth="0.5"
             strokeDasharray="2 2"
-            opacity="0.5"
           />
         </svg>
       )}
 
       <div className="relative flex flex-col items-center">
+        {/* Streak Glow Indicator */}
+        {streak >= 5 && (
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -mt-10">
+                 <motion.div 
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                    className="w-40 h-40 bg-gold/30 rounded-full blur-3xl pointer-events-none"
+                 />
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                    <span className="text-2xl">🔥</span>
+                    <span className="text-xs font-black text-amber-700 whitespace-nowrap">STREAK ON FIRE!</span>
+                 </div>
+            </div>
+        )}
+
         {nodes.map((node) => (
           <Node 
             key={node.day_number} 
