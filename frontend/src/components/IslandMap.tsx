@@ -1,15 +1,20 @@
 "use client";
 
-import { motion, AnimatePresence } from "motion/react";
-import { Habit, HabitStatus } from "@/actions/habitActions";
-import { Star, Skull, Lock, TreePalm, Home, Castle, Waves } from "lucide-react";
+import { motion } from "motion/react";
+import { Habit } from "@/actions/habitActions";
+import { Star, Skull, Lock, TreePalm, Home, Castle, Waves, LucideIcon } from "lucide-react";
 
 interface IslandMapProps {
   habits: Habit[];
   onNodeClick: (habit: Habit) => void;
 }
 
-const ASSET_MILESTONES: Record<number, any> = {
+interface AssetMilestone {
+  icon: LucideIcon;
+  label: string;
+}
+
+const ASSET_MILESTONES: Record<number, AssetMilestone> = {
   3: { icon: TreePalm, label: "Palm Trees" },
   10: { icon: Home, label: "A Hut" },
   20: { icon: Waves, label: "A Bridge" },
@@ -64,7 +69,7 @@ export default function IslandMap({ habits, onNodeClick }: IslandMapProps) {
       )}
 
       <div className="relative flex flex-col items-center">
-        {nodes.map((node, i) => (
+        {nodes.map((node) => (
           <Node 
             key={node.day_number} 
             node={node} 
