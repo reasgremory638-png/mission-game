@@ -50,16 +50,18 @@ export default function IslandMap({ habits, onNodeClick }: IslandMapProps) {
         })}
       </div>
 
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path
-          d={`M ${nodes[0]?.x} ${nodes[0]?.y} ${nodes.map(n => `L ${n.x} ${n.y}`).join(' ')}`}
-          fill="none"
-          stroke="#4ECDC4"
-          strokeWidth="0.5"
-          strokeDasharray="2 2"
-          opacity="0.5"
-        />
-      </svg>
+      {nodes.length > 0 && (
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path
+            d={`M ${nodes[0].x} ${nodes[0].y} ${nodes.slice(1).map(n => `L ${n.x} ${n.y}`).join(' ')}`}
+            fill="none"
+            stroke="#4ECDC4"
+            strokeWidth="0.5"
+            strokeDasharray="2 2"
+            opacity="0.5"
+          />
+        </svg>
+      )}
 
       <div className="relative flex flex-col items-center">
         {nodes.map((node, i) => (
